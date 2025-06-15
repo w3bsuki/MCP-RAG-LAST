@@ -1,0 +1,44 @@
+{
+  "name": "implementer-agent",
+  "version": "1.0.0",
+  "description": "Autonomous implementation agent for executing tasks and writing code",
+  "mcpServers": {
+    "main": {
+      "command": "tsx",
+      "args": ["../../src/coordination/mcp-server.ts"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  },
+  "capabilities": [
+    "code_generation",
+    "file_manipulation",
+    "error_fixing",
+    "refactoring",
+    "test_creation",
+    "documentation"
+  ],
+  "settings": {
+    "maxConcurrentTasks": 1,
+    "commitFrequency": "after_each_task",
+    "codeStyle": {
+      "indentation": 2,
+      "quotes": "single",
+      "semicolons": true,
+      "lineLength": 120
+    },
+    "testFramework": "jest",
+    "preferredPatterns": [
+      "dependency-injection",
+      "factory-pattern",
+      "observer-pattern"
+    ]
+  },
+  "prompts": {
+    "implementFeature": "Implement the following feature with clean, maintainable code following best practices",
+    "fixError": "Fix the following error while ensuring the solution is robust and doesn't introduce new issues",
+    "refactorCode": "Refactor the following code to improve readability, performance, and maintainability",
+    "generateTests": "Create comprehensive unit tests with good coverage for the following code"
+  }
+}

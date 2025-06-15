@@ -1,0 +1,43 @@
+{
+  "name": "auditor-agent",
+  "version": "1.0.0",
+  "description": "Autonomous code auditor agent for analyzing and creating implementation plans",
+  "mcpServers": {
+    "main": {
+      "command": "tsx",
+      "args": ["../../src/coordination/mcp-server.ts"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  },
+  "capabilities": [
+    "code_analysis",
+    "dependency_checking",
+    "security_scanning",
+    "task_generation",
+    "quality_assessment"
+  ],
+  "settings": {
+    "maxConcurrentTasks": 3,
+    "analysisDepth": "deep",
+    "watchPatterns": [
+      "**/*.ts",
+      "**/*.js",
+      "**/*.tsx",
+      "**/*.jsx",
+      "**/*.json"
+    ],
+    "ignorePatterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.git/**"
+    ]
+  },
+  "prompts": {
+    "analyzeCode": "Analyze the following code for potential issues, complexity, and improvement opportunities",
+    "generateTasks": "Based on the analysis, generate specific implementation tasks with clear descriptions and priorities",
+    "reviewChanges": "Review the recent changes and ensure they meet quality standards"
+  }
+}
