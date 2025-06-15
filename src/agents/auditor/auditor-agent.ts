@@ -41,7 +41,10 @@ export class AuditorAgent extends BaseAgent {
         '**/.git/**',
         '**/dist/**',
         '**/build/**',
-        '**/*.log'
+        '**/*.log',
+        '**/milvus-data/**',
+        '**/mcp-rag.config.json',
+        '**/.env'
       ],
       persistent: true,
       ignoreInitial: false
@@ -286,4 +289,32 @@ export class AuditorAgent extends BaseAgent {
       await this.fileWatcher.close();
     }
   }
+}
+
+// Main entry point for standalone execution
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const agent = new AuditorAgent({
+    id: process.env.AGENT_ID || 'auditor-1',
+    name: process.env.AGENT_NAME || 'Auditor Agent',
+    type: 'auditor',
+    capabilities: ['code-analysis', 'security-audit', 'performance-analysis'],
+    mcpServerUrl: process.env.MCP_SERVER_URL || 'http://localhost:3000',
+    worktreePath: process.env.WORKTREE_PATH || process.cwd()
+  });
+
+  agent.initialize().catch((error) => {
+    logger.error('AuditorAgent', 'Failed to start agent', error);
+    process.exit(1);
+  });
+
+  // Handle graceful shutdown
+  process.on('SIGINT', async () => {
+    await agent.shutdown();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    await agent.shutdown();
+    process.exit(0);
+  });
 }

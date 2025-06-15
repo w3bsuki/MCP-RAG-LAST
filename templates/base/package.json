@@ -1,0 +1,16 @@
+{
+  "name": "mcp-rag-project",
+  "version": "1.0.0",
+  "description": "MCP/RAG Autonomous Agent System",
+  "type": "module",
+  "scripts": {
+    "start": "node node_modules/@w3bsuki/mcp-rag-system/scripts/launch-system.js",
+    "setup": "node node_modules/@w3bsuki/mcp-rag-system/scripts/setup.js",
+    "monitor": "node node_modules/@w3bsuki/mcp-rag-system/src/coordination/monitor.js",
+    "dashboard": "node dashboard.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@w3bsuki/mcp-rag-system": "github:w3bsuki/MCP-RAG-LAST"
+  }
+}

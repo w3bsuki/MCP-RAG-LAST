@@ -344,3 +344,31 @@ export class ValidatorAgent extends BaseAgent {
     }
   }
 }
+
+// Main entry point for standalone execution
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const agent = new ValidatorAgent({
+    id: process.env.AGENT_ID || 'validator-1',
+    name: process.env.AGENT_NAME || 'Validator Agent',
+    type: 'validator',
+    capabilities: ['testing', 'validation', 'quality-assurance'],
+    mcpServerUrl: process.env.MCP_SERVER_URL || 'http://localhost:3000',
+    worktreePath: process.env.WORKTREE_PATH || process.cwd()
+  });
+
+  agent.initialize().catch((error) => {
+    logger.error('ValidatorAgent', 'Failed to start agent', error);
+    process.exit(1);
+  });
+
+  // Handle graceful shutdown
+  process.on('SIGINT', async () => {
+    await agent.shutdown();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    await agent.shutdown();
+    process.exit(0);
+  });
+}

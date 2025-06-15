@@ -300,3 +300,31 @@ export class ImplementerAgent extends BaseAgent {
     }
   }
 }
+
+// Main entry point for standalone execution
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const agent = new ImplementerAgent({
+    id: process.env.AGENT_ID || 'implementer-1',
+    name: process.env.AGENT_NAME || 'Implementer Agent',
+    type: 'implementer',
+    capabilities: ['code-generation', 'refactoring', 'testing'],
+    mcpServerUrl: process.env.MCP_SERVER_URL || 'http://localhost:3000',
+    worktreePath: process.env.WORKTREE_PATH || process.cwd()
+  });
+
+  agent.initialize().catch((error) => {
+    logger.error('ImplementerAgent', 'Failed to start agent', error);
+    process.exit(1);
+  });
+
+  // Handle graceful shutdown
+  process.on('SIGINT', async () => {
+    await agent.shutdown();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    await agent.shutdown();
+    process.exit(0);
+  });
+}

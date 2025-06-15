@@ -33,6 +33,7 @@ export class MCPServer {
   private server: Server;
   private contextManager: ContextManager;
   private ragSystem: RAGSystem;
+  private rateLimiter: Map<string, { count: number; resetTime: number }> = new Map();
 
   constructor() {
     this.server = new Server(

@@ -1,0 +1,9 @@
+{
+  "projectName": "mcp-rag-system",
+  "milvusHost": "localhost",
+  "milvusPort": 19530,
+  "gitWorktrees": true,
+  "gitProvider": "github",
+  "autoMode": "full-auto",
+  "contextPath": "./shared-context"
+}

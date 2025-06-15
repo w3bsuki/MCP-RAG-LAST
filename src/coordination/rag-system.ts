@@ -3,21 +3,36 @@ import { config } from '../config/index.js';
 import { logger } from '../utils/logger.js';
 import { RAGDocument, RAGQueryResult } from '../types/index.js';
 import { createHash } from 'crypto';
+import { RAGSystemLite } from './rag-system-lite.js';
 
 export class RAGSystem {
   private client!: MilvusClient;
+  private liteSystem?: RAGSystemLite;
   private collectionName: string;
   private isInitialized = false;
+  private useLiteMode = false;
 
   constructor() {
     this.collectionName = config.rag.collectionName;
+    
+    // Check if we should use lite mode
+    const milvusAddress = process.env.MILVUS_ADDRESS || 'localhost:19530';
+    this.useLiteMode = milvusAddress.endsWith('.db') || milvusAddress === './milvus.db';
   }
 
   async initialize(): Promise<void> {
-    logger.info('RAGSystem', 'Initializing RAG system');
+    logger.info('RAGSystem', `Initializing RAG system (${this.useLiteMode ? 'SQLite mode' : 'Milvus mode'})`);
+    
+    if (this.useLiteMode) {
+      // Use SQLite-based RAG
+      this.liteSystem = new RAGSystemLite();
+      await this.liteSystem.initialize();
+      this.isInitialized = true;
+      return;
+    }
     
     try {
-      // Initialize Milvus client
+      // Try to connect to Milvus
       const milvusAddress = process.env.MILVUS_ADDRESS || 'localhost:19530';
       const milvusToken = process.env.MILVUS_TOKEN;
       
@@ -47,10 +62,17 @@ export class RAGSystem {
       }
 
       this.isInitialized = true;
-      logger.info('RAGSystem', 'RAG system initialized successfully');
+      logger.info('RAGSystem', 'Milvus RAG system initialized successfully');
     } catch (error) {
-      logger.error('RAGSystem', 'Failed to initialize RAG system', error);
-      throw error;
+      logger.warn('RAGSystem', 'Failed to connect to Milvus, falling back to SQLite mode', error);
+      
+      // Fallback to SQLite
+      this.useLiteMode = true;
+      this.liteSystem = new RAGSystemLite();
+      await this.liteSystem.initialize();
+      this.isInitialized = true;
+      
+      logger.info('RAGSystem', 'RAG system initialized in SQLite mode');
     }
   }
 
@@ -116,6 +138,10 @@ export class RAGSystem {
       throw new Error('RAG system not initialized');
     }
 
+    if (this.useLiteMode && this.liteSystem) {
+      return await this.liteSystem.store(content, metadata, id);
+    }
+
     // Validate content length
     if (!content || content.length > 65535) {
       throw new Error('Content must be between 1 and 65535 characters');
@@ -167,6 +193,10 @@ export class RAGSystem {
   async query(queryText: string, maxResults: number = 10, threshold: number = 0.7): Promise<RAGQueryResult> {
     if (!this.isInitialized) {
       throw new Error('RAG system not initialized');
+    }
+
+    if (this.useLiteMode && this.liteSystem) {
+      return await this.liteSystem.query(queryText, maxResults, threshold);
     }
 
     try {

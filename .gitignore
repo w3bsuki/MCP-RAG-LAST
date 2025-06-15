@@ -39,6 +39,15 @@ rag-store/cache/*
 !rag-store/indexes/.gitkeep
 !rag-store/cache/.gitkeep
 
+# Milvus data directories
+milvus-data/
+*.db
+*.db-journal
+
+# Test files
+test-mcp-rag.js
+test-mcp-rag.mjs
+
 # Git worktrees
 worktrees/*
 !worktrees/.gitkeep
