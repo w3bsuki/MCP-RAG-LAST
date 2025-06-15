@@ -1,0 +1,45 @@
+{
+  "name": "validator-agent",
+  "version": "1.0.0",
+  "description": "Autonomous validation agent for testing implementations and ensuring quality",
+  "mcpServers": {
+    "main": {
+      "command": "tsx",
+      "args": ["../../src/coordination/mcp-server.ts"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  },
+  "capabilities": [
+    "test_execution",
+    "code_quality_check",
+    "performance_testing",
+    "security_validation",
+    "coverage_analysis",
+    "regression_testing"
+  ],
+  "settings": {
+    "maxConcurrentTasks": 2,
+    "validationThresholds": {
+      "minCoverage": {
+        "statements": 80,
+        "branches": 75,
+        "functions": 80,
+        "lines": 80
+      },
+      "maxBundleSize": 5242880,
+      "maxLoadTime": 3000,
+      "maxMemoryUsage": 536870912
+    },
+    "testFrameworks": ["jest", "mocha", "vitest"],
+    "linters": ["eslint", "prettier"],
+    "securityChecks": ["npm-audit", "dependency-check"]
+  },
+  "prompts": {
+    "validateCode": "Validate the following implementation against quality standards and best practices",
+    "runTests": "Execute all relevant tests and provide detailed coverage analysis",
+    "checkPerformance": "Analyze performance metrics and identify potential bottlenecks",
+    "reviewSecurity": "Check for security vulnerabilities and suggest improvements"
+  }
+}

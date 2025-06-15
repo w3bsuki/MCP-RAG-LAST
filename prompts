@@ -1,0 +1,456 @@
+🚀 ULTIMATE CLAUDE CODE PROMPT
+Build the Perfect MCP/RAG Multi-Agent System
+Copy this entire prompt to Claude Code for flawless implementation
+
+🎯 PROJECT MISSION
+You are building a revolutionary autonomous multi-agent development system that will eliminate the "agent stopping" problem plaguing current solutions. This system will be superior to claude-swarm, claude-flow, and other existing implementations through focused simplicity and battle-tested reliability patterns.
+
+What You're Creating
+3 Specialized Agents: Auditor → Implementer → Validator workflow
+
+MCP Coordination: Real-time context sharing between agents
+
+RAG Memory: Persistent knowledge base with contextual retrieval
+
+Git Worktree Isolation: Conflict-free parallel development
+
+24/7 Operation: Self-healing system that never stops working
+
+Success Criteria
+Zero agent stopping incidents
+
+Sub-10-second context synchronization
+
+90%+ task completion rate
+
+85%+ memory retrieval accuracy
+
+5-minute setup time
+
+📚 REQUIRED READING (Review These First)
+Essential Documentation
+MCP TypeScript SDK: https://github.com/modelcontextprotocol/typescript-sdk
+
+MCP Official Docs: https://modelcontextprotocol.io/introduction
+
+Claude Code Documentation: https://docs.anthropic.com/en/docs/claude-code/overview
+
+Git Worktree Guide: https://docs.anthropic.com/en/docs/claude-code/common-workflows
+
+Contextual Retrieval: https://www.anthropic.com/news/contextual-retrieval
+
+Implementation Patterns
+MCP Server Tutorial: https://www.leanware.co/insights/how-to-build-mcp-server
+
+Multi-Agent Research: https://www.rohan-paul.com/p/anthropic-reveals-multi-agent-claude
+
+RAG Best Practices: https://www.dhiwise.com/post/build-rag-pipeline-guide
+
+Parallel Development: https://egghead.io/launch-multiple-cursor-composer-ai-agents-to-work-in-parallel~y1q56
+
+Competitive Analysis
+claude-swarm: https://github.com/parruda/claude-swarm
+
+claude-flow: https://github.com/ceciliomichael/ClaudeFlow
+
+mcp-mindmesh: https://github.com/7ossamfarid/mcp-mindmesh
+
+🏗️ IMPLEMENTATION ROADMAP
+Phase 1: Foundation Setup (30 minutes)
+bash
+# Project initialization
+mkdir autonomous-mcp-rag-system && cd autonomous-mcp-rag-system
+npm init -y
+
+# Core dependencies (exact versions for stability)
+npm install @modelcontextprotocol/sdk@latest
+npm install milvus-lite@2.4.0
+npm install chokidar@3.6.0 simple-git@3.21.0
+npm install dotenv@16.4.5 zod@3.22.4
+
+# Optimal directory structure
+mkdir -p {agents,coordination,rag-store,worktrees,logs,scripts}
+mkdir -p coordination/{context,tools,recovery}
+mkdir -p rag-store/{vectors,indexes,cache}
+mkdir -p agents/{auditor,implementer,validator}
+Phase 2: MCP Server Core (45 minutes)
+Create the central coordination server following MCP best practices:
+
+File: coordination/mcp-server.ts
+
+Implement Server class from @modelcontextprotocol/sdk
+
+4 core tools: update_context, get_context, rag_store, rag_query
+
+Real-time context synchronization
+
+Error handling and recovery mechanisms
+
+Follow patterns from documentation links above
+
+Required Tools Schema:
+
+typescript
+{
+  update_context: {
+    description: 'Update shared context between agents',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        agent: { type: 'string' },
+        data: { type: 'object' }
+      }
+    }
+  },
+  get_context: {
+    description: 'Retrieve current coordination state',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        filter: { type: 'string', optional: true }
+      }
+    }
+  },
+  rag_store: {
+    description: 'Store knowledge in vector database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        content: { type: 'string' },
+        metadata: { type: 'object' }
+      }
+    }
+  },
+  rag_query: {
+    description: 'Retrieve relevant context from memory',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string' },
+        limit: { type: 'number', default: 5 }
+      }
+    }
+  }
+}
+Phase 3: Git Worktree Management (30 minutes)
+File: coordination/worktree-manager.ts
+
+Automatic worktree creation for each agent
+
+Isolation management (critical for preventing conflicts)
+
+Shared git history maintenance
+
+Cleanup and recovery functions
+
+Key Functions:
+
+typescript
+async createAgentWorktree(agentName: string): Promise<string>
+async syncWorktrees(): Promise<void>
+async cleanupWorktrees(): Promise<void>
+async repairWorktree(agentName: string): Promise<void>
+Phase 4: RAG Implementation (60 minutes)
+File: rag-store/contextual-rag.ts
+
+Implement Anthropic's contextual retrieval pattern
+
+Local vector database with Milvus Lite
+
+Hybrid search (vector + keyword)
+
+512-token chunks with contextual enhancement
+
+Evaluation metrics for retrieval accuracy
+
+Core Features:
+
+Contextual chunk enhancement before embedding
+
+Hybrid search combining vector and keyword results
+
+Automatic cleanup and optimization
+
+Performance monitoring and metrics
+
+Phase 5: Shared Context System (45 minutes)
+File: coordination/context-manager.ts
+
+Real-time context file management
+
+File watching for immediate updates
+
+Conflict resolution for concurrent updates
+
+State persistence and recovery
+
+Context Structure:
+
+json
+{
+  "agents": {
+    "auditor": { 
+      "status": "active", 
+      "currentTask": null, 
+      "lastUpdate": "2025-06-15T08:22:00Z",
+      "worktree": "worktrees/agent-auditor"
+    },
+    "implementer": { 
+      "status": "active", 
+      "currentTask": null, 
+      "lastUpdate": "2025-06-15T08:22:00Z",
+      "worktree": "worktrees/agent-implementer"
+    },
+    "validator": { 
+      "status": "active", 
+      "currentTask": null, 
+      "lastUpdate": "2025-06-15T08:22:00Z",
+      "worktree": "worktrees/agent-validator"
+    }
+  },
+  "taskQueue": [],
+  "completedTasks": [],
+  "systemStatus": "running",
+  "lastSync": "2025-06-15T08:22:00Z"
+}
+Phase 6: Agent Configuration (30 minutes)
+Create configuration files for each agent:
+
+Agent 1 - Auditor (agents/auditor/config.json):
+
+json
+{
+  "role": "code-auditor",
+  "worktree": "worktrees/agent-auditor",
+  "responsibilities": [
+    "Analyze codebase for improvements",
+    "Generate detailed implementation plans",
+    "Update shared context with actionable tasks",
+    "Monitor code quality standards"
+  ],
+  "tools": ["rag_query", "update_context", "get_context"],
+  "brain": "You are Code Auditor v3.0. Your job: Analyze → Plan → Queue tasks for implementation. Always update shared context with your findings.",
+  "workflow": {
+    "scanInterval": 300000,
+    "analysisDepth": "comprehensive",
+    "outputFormat": "structured-tasks"
+  }
+}
+Agent 2 - Implementer (agents/implementer/config.json):
+
+json
+{
+  "role": "code-implementer",
+  "worktree": "worktrees/agent-implementer",
+  "responsibilities": [
+    "Execute tasks from shared context",
+    "Write and modify code according to specifications",
+    "Run tests and basic validations",
+    "Report progress and results"
+  ],
+  "tools": ["rag_store", "update_context", "get_context"],
+  "brain": "You are Code Builder v2.0. Your job: Read tasks → Implement → Test → Report progress. Always store knowledge in RAG and update context.",
+  "workflow": {
+    "taskPollInterval": 30000,
+    "testingLevel": "basic",
+    "commitStrategy": "incremental"
+  }
+}
+Agent 3 - Validator (agents/validator/config.json):
+
+json
+{
+  "role": "code-validator",
+  "worktree": "worktrees/agent-validator",
+  "responsibilities": [
+    "Test all implementations thoroughly",
+    "Verify adherence to best practices",
+    "Ensure code quality standards",
+    "Mark tasks as complete or request revisions"
+  ],
+  "tools": ["rag_validate", "update_context", "get_context"],
+  "brain": "You are Quality Guardian v1.0. Your job: Test → Verify → Approve/Reject → Document. Ensure all code meets standards before approval.",
+  "workflow": {
+    "testingLevel": "comprehensive",
+    "qualityGates": ["syntax", "logic", "performance", "security"],
+    "approvalRequired": true
+  }
+}
+Phase 7: Recovery and Monitoring (45 minutes)
+File: coordination/recovery-system.ts
+
+Health monitoring every 60 seconds
+
+Automatic agent restart with context preservation
+
+Context rollback capabilities
+
+Comprehensive logging and debugging
+
+Key Features:
+
+Agent health checks with timeout detection
+
+Automatic recovery with preserved context
+
+System-wide monitoring dashboard
+
+Performance metrics collection
+
+Phase 8: Launch Orchestration (30 minutes)
+File: scripts/launch-system.js
+
+Complete system initialization
+
+Parallel agent launching
+
+Health check verification
+
+Monitoring setup
+
+Package.json Scripts:
+
+json
+{
+  "scripts": {
+    "setup": "node scripts/setup.js",
+    "start": "node scripts/launch-system.js",
+    "start:auditor": "cd worktrees/agent-auditor && claude --config ../../agents/auditor/config.json",
+    "start:implementer": "cd worktrees/agent-implementer && claude --config ../../agents/implementer/config.json",
+    "start:validator": "cd worktrees/agent-validator && claude --config ../../agents/validator/config.json",
+    "monitor": "node coordination/monitor.js",
+    "debug": "node coordination/debug.js",
+    "recover": "node coordination/recovery-system.js",
+    "test": "node scripts/test-system.js"
+  }
+}
+🔧 IMPLEMENTATION REQUIREMENTS
+Code Quality Standards
+TypeScript strict mode for all files
+
+Comprehensive error handling with try-catch blocks
+
+Logging for all major operations
+
+Input validation using Zod schemas
+
+Performance monitoring for all operations
+
+Architecture Principles
+Simplicity over complexity - avoid over-engineering
+
+Reliability over features - focus on stability
+
+Real-time updates - sub-10-second synchronization
+
+Self-healing capabilities - automatic recovery
+
+Monitoring and observability - comprehensive logging
+
+Testing Requirements
+Unit tests for core components
+
+Integration tests for agent coordination
+
+Performance benchmarks against existing solutions
+
+24-hour stress test for continuous operation
+
+Recovery testing for failure scenarios
+
+✅ VALIDATION CHECKLIST
+System Launch Validation
+ All 3 agents start successfully in separate worktrees
+
+ MCP server responds to all 4 tool calls
+
+ Context updates propagate in < 10 seconds
+
+ RAG system stores and retrieves data accurately
+
+ No file conflicts between agents
+
+ Recovery system activates when agents stop
+
+Performance Validation
+ Context sync latency < 10 seconds
+
+ RAG retrieval time < 2 seconds
+
+ Agent response time < 5 seconds
+
+ System startup time < 30 seconds
+
+ Memory usage < 1GB baseline
+
+ 90%+ task completion rate
+
+Operational Validation
+ System runs continuously for 2+ hours without intervention
+
+ Agents automatically recover from failures
+
+ Task queue processes correctly
+
+ Context remains synchronized across all agents
+
+ RAG memory grows and improves over time
+
+ Git worktrees maintain isolation
+
+🎯 SUCCESS METRICS
+Primary KPIs
+Agent Uptime: 99%+ continuous operation
+
+Context Sync: < 10 seconds propagation
+
+Task Completion: 90%+ success rate
+
+Memory Accuracy: 85%+ retrieval relevance
+
+Setup Time: < 5 minutes from start to running
+
+Comparison Benchmarks
+vs claude-swarm: 50% faster setup, 90% fewer failures
+
+vs claude-flow: 3x better persistence, full RAG integration
+
+vs manual coordination: 5x faster task completion
+
+🚀 FINAL IMPLEMENTATION NOTES
+Key Success Factors
+Follow Documentation Links: Review all provided links before coding
+
+Implement Incrementally: Build and test each phase before proceeding
+
+Focus on Reliability: Prioritize stability over advanced features
+
+Test Thoroughly: Validate each component works before integration
+
+Monitor Performance: Track metrics from day one
+
+Common Pitfalls to Avoid
+Over-complexity: Keep the architecture simple and focused
+
+Skipping Error Handling: Robust error handling prevents agent stopping
+
+Ignoring Context Sync: Real-time updates are critical for coordination
+
+Missing Recovery Logic: Agents must be able to restart automatically
+
+Poor Git Isolation: Worktrees prevent most file conflicts
+
+Final Deliverable
+A production-ready system that:
+
+Starts with a single npm start command
+
+Runs 3 agents in perfect coordination
+
+Never stops working due to proper recovery
+
+Outperforms all existing multi-agent solutions
+
+Provides the foundation for unlimited agent scaling
+
+Begin implementation now following Phase 1 and proceed sequentially through each phase.
