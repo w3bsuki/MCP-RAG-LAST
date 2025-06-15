@@ -1,58 +1,72 @@
-# Autonomous MCP/RAG Multi-Agent Development System
+# Claude-Code MCP/RAG Task Coordination System
 
-A self-sustaining 3-agent system using the Model Context Protocol (MCP) with RAG (Retrieval-Augmented Generation) memory that eliminates the "agent stopping" problem through proper coordination, shared memory, and isolation patterns.
+> **✅ Real Implementation: Claude-Code instances working together via tasks!**
+
+A task-based coordination system where multiple Claude-Code instances collaborate through MCP tools, shared task management, and RAG memory. This is NOT an autonomous agent system - Claude provides the intelligence.
 
 ## 🚀 Features
 
-- **3 Specialized Autonomous Agents**
-  - **Auditor**: Analyzes code and creates implementation plans
-  - **Implementer**: Executes tasks and writes code
+- **3 Claude-Code Roles**
+  - **Auditor**: Analyzes code and creates improvement tasks
+  - **Implementer**: Claims tasks and writes code
   - **Validator**: Tests implementations and ensures quality
 
-- **MCP Server with 4 Core Tools**
-  - `update_context`: Share state between agents
-  - `get_context`: Retrieve coordination state
-  - `rag_store`: Store knowledge in vector DB
-  - `rag_query`: Retrieve relevant context
+- **Task-Based Coordination**
+  - Tasks with tags route work between roles
+  - Priority-based task queue
+  - Dependency tracking
+  - Status workflows
+
+- **MCP Server with 9 Tools**
+  - `create_task`, `get_tasks`, `claim_task`, `update_task`, `complete_task`
+  - `update_context`, `get_context`
+  - `rag_store`, `rag_query`
 
 - **Advanced Capabilities**
-  - Git worktree isolation for conflict-free development
-  - RAG memory system for persistent knowledge
-  - Automatic recovery and health monitoring
-  - Real-time shared context synchronization
-  - Performance monitoring dashboard
+  - Real vector search with Milvus
+  - Shared context and memory
+  - Role-specific configurations
+  - Tag-based task routing
 
 ## 📋 Prerequisites
 
 - Node.js 18+ LTS
 - Git
+- Docker Desktop (for Milvus vector database)
 - TypeScript knowledge (for customization)
 
 ## 🛠️ Installation
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd autonomous-mcp-system
+git clone https://github.com/w3bsuki/MCP-RAG-LAST.git
+cd MCP-RAG-LAST
 
 # Install dependencies
 npm install
 
-# Run setup
-npm run setup
+# Start Milvus (required for RAG)
+docker run -d --name milvus-standalone \
+  -p 19530:19530 -p 9091:9091 \
+  milvusdb/milvus:v2.3.3 milvus run standalone
 ```
 
 ## 🚀 Quick Start
 
 ```bash
-# Launch the entire system
-npm start
+# 1. Start the MCP server
+npm run start:mcp
 
-# Monitor system health (in another terminal)
-npm run monitor
+# 2. In separate terminals, launch Claude instances
+npm run claude:auditor      # Terminal 1
+npm run claude:implementer   # Terminal 2
+npm run claude:validator     # Terminal 3
 
-# Run tests
-npm test
+# 3. Create some example tasks
+npm run task:seed
+
+# 4. Watch the Claudes work!
+npm run task:list
 ```
 
 ## 📁 Project Structure

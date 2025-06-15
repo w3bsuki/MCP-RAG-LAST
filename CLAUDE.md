@@ -1,109 +1,239 @@
-# CLAUDE.md
+# CLAUDE.md - Claude-Code MCP/RAG Task System
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this task-based coordination system.
 
 ## Project Overview
 
-This is an Autonomous MCP/RAG Multi-Agent Development System that creates a self-sustaining 3-agent system using the Model Context Protocol (MCP) with RAG (Retrieval-Augmented Generation) memory. The system eliminates the "agent stopping" problem through proper coordination, shared memory, and isolation patterns.
+This is a Claude-Code based task coordination system where multiple Claude instances work together through shared tasks, MCP tools, and RAG memory.
 
-## Development Commands
+**IMPORTANT**: This is NOT an autonomous agent system. YOU (Claude) are the intelligence. The system provides:
+- Role configurations (Auditor, Implementer, Validator)
+- Task management with tags
+- MCP tools for coordination
+- RAG memory for patterns
 
-### Setup and Build
+## Quick Start
+
+### For Humans
 ```bash
-npm install           # Install all dependencies
-npm run setup         # Initialize git worktrees and directories
-npm run build         # Compile TypeScript to JavaScript
-npm run typecheck     # Check TypeScript types without building
+# 1. Start Milvus (required for RAG)
+docker run -d --name milvus-standalone -p 19530:19530 -p 9091:9091 milvusdb/milvus:v2.3.3 milvus run standalone
+
+# 2. Install dependencies
+npm install
+
+# 3. Start MCP server
+npm run start:mcp
+
+# 4. In separate terminals, start Claude instances
+npm run claude:auditor      # Terminal 1
+npm run claude:implementer   # Terminal 2  
+npm run claude:validator     # Terminal 3
 ```
 
-### Running the System
-```bash
-npm start             # Launch entire system (MCP server + all agents)
-npm run monitor       # Real-time monitoring dashboard
-npm run recover       # Run recovery system standalone
-npm run debug         # Debug system state
-```
+### For Claude Instances
 
-### Development
-```bash
-npm run dev           # Run with auto-reload
-npm run lint          # Run ESLint
-npm run format        # Format code with Prettier
-npm test              # Run all system tests
-```
+When you start, you'll receive:
+1. Your role (Auditor, Implementer, or Validator)
+2. Tags to watch for
+3. Available MCP tools
+4. Rules and guidelines
 
-### Individual Components
-```bash
-# Start components individually (for debugging)
-tsx src/coordination/mcp-server.ts
-tsx src/agents/auditor/auditor-agent.ts
-tsx src/agents/implementer/implementer-agent.ts
-tsx src/agents/validator/validator-agent.ts
+Start by running:
+```javascript
+// See what tasks are available for your role
+get_tasks({ 
+  tags: ["YOUR_WATCH_TAGS"], 
+  status: ["pending"] 
+})
 ```
 
 ## Architecture
 
-### System Flow
-1. **MCP Server** starts and initializes shared context and RAG system
-2. **Recovery System** monitors all agents and restarts failed ones
-3. **Auditor Agent** watches files, analyzes code, generates tasks
-4. **Implementer Agent** picks up tasks, writes code in isolated worktree
-5. **Validator Agent** tests implementations, ensures quality
-6. All agents communicate through shared context via MCP tools
+```
+┌─────────────────────────────────────────────────────┐
+│                  Task Manager (MCP)                  │
+│  - Shared task list with tags                       │
+│  - Task status tracking                              │
+│  - Role-based filtering                             │
+└──────────────────┬──────────────────────────────────┘
+                   │
+     ┌─────────────┴─────────────┬─────────────────┐
+     │                           │                   │
+┌────▼──────┐           ┌───────▼────────┐   ┌─────▼──────┐
+│ Claude #1 │           │   Claude #2    │   │ Claude #3  │
+│ AUDITOR   │           │  IMPLEMENTER   │   │ VALIDATOR  │
+└───────────┘           └────────────────┘   └────────────┘
+     │                           │                   │
+     └─────────────┬─────────────┴─────────────────┘
+                   │
+            ┌──────▼──────┐
+            │  RAG Memory │
+            └─────────────┘
+```
 
-### Core Components
+## Available MCP Tools
 
-1. **MCP Server** (`src/coordination/mcp-server.ts`)
-   - Implements 4 MCP tools for agent coordination
-   - Manages shared context and RAG operations
-   - All agents connect to this server via stdio transport
+### Task Management
+- `create_task(title, description, tags, priority?)` - Create new task
+- `get_tasks(filter?)` - Get filtered task list
+- `claim_task(taskId)` - Assign task to yourself
+- `update_task(taskId, updates)` - Update task details
+- `complete_task(taskId, results?)` - Mark task complete
 
-2. **Agent System** (`src/agents/`)
-   - `BaseAgent` class provides lifecycle, health monitoring, MCP client
-   - Each agent extends BaseAgent with specific capabilities
-   - Agents work in isolated git worktrees to prevent conflicts
+### Context & Memory
+- `update_context(updates)` - Share information
+- `get_context(paths?)` - Read shared context
+- `rag_store(content, metadata)` - Save patterns
+- `rag_query(query)` - Find similar solutions
 
-3. **Context Management** (`src/coordination/context/context-manager.ts`)
-   - Atomic file operations with backup support
-   - Debounced updates (5-10 second intervals)
-   - Version tracking and conflict resolution
+## Role Guidelines
 
-4. **RAG System** (`src/coordination/rag-system.ts`)
-   - Uses Milvus vector database (requires local instance)
-   - Stores code analysis, implementation patterns, validation results
-   - Placeholder embeddings (production needs real embedding model)
+### Auditor Role
+**Purpose**: Analyze code and create improvement tasks
 
-5. **Recovery System** (`src/coordination/recovery/recovery-system.ts`)
-   - Health checks every 10 seconds
-   - Auto-restart with exponential backoff (max 3 attempts)
-   - Monitors task queue and agent states
+**Watch Tags**: `ANALYZE`, `AUDIT`, `REVIEW`, `SECURITY`, `PERFORMANCE`
 
-### Key Design Patterns
+**Workflow**:
+1. Analyze codebase for issues
+2. Create detailed tasks with proper tags
+3. Store patterns in RAG for future reference
 
-- **Event-Driven**: Components use EventEmitter for loose coupling
-- **Fail-Safe**: All operations have error handling and recovery
-- **Atomic Operations**: Context updates are atomic with file locking
-- **Isolation**: Each agent works in separate git worktree
-- **Monitoring**: Built-in performance tracking and alerting
+**Example**:
+```javascript
+// After analyzing
+create_task({
+  title: "Optimize bundle size",
+  description: "Current bundle is 2.3MB, can be reduced by code splitting",
+  tags: ["IMPLEMENT", "PERFORMANCE"],
+  priority: 4
+})
+```
 
-### Configuration
+### Implementer Role
+**Purpose**: Write code and implement features
 
-System configured via environment variables (see `.env.example`):
-- `CONTEXT_UPDATE_INTERVAL`: How often to sync context (default: 5000ms)
-- `RECOVERY_ENABLED`: Enable/disable auto-recovery (default: true)
-- `LOG_LEVEL`: Logging verbosity (debug|info|warn|error)
-- `RAG_COLLECTION_NAME`: Milvus collection name
+**Watch Tags**: `IMPLEMENT`, `FEATURE`, `FIX`, `REFACTOR`, `UPDATE`
 
-### Performance Targets
-- Context sync latency: < 10 seconds
-- RAG retrieval time: < 2 seconds
-- Agent response time: < 5 seconds
-- Memory usage: < 1GB baseline
-- Task completion rate: > 90%
+**Workflow**:
+1. Claim tasks matching your tags
+2. Query RAG for similar implementations
+3. Write code following patterns
+4. Create test tasks when done
 
-### Important Notes
+**Example**:
+```javascript
+// Before implementing
+const similar = await rag_query("dark mode implementation svelte")
 
-1. **Milvus Dependency**: RAG system expects Milvus running on localhost:19530
-2. **Git Requirement**: System uses git worktrees, requires initialized git repo
-3. **Node Version**: Requires Node.js 18+ for native fetch and other features
-4. **TypeScript**: All source in TypeScript, use `tsx` for direct execution
+// After implementing
+complete_task(taskId, {
+  files: ["src/lib/theme.ts", "src/App.svelte"],
+  commands: ["npm run build"]
+})
+
+create_task({
+  title: "Test dark mode feature",
+  description: "Validate dark mode works across all components",
+  tags: ["TEST", "VALIDATE"]
+})
+```
+
+### Validator Role
+**Purpose**: Test and validate implementations
+
+**Watch Tags**: `TEST`, `VALIDATE`, `DEPLOY`, `RELEASE`, `CHECK`
+
+**Workflow**:
+1. Run tests on completed features
+2. Validate builds and deployments
+3. Create fix tasks for failures
+
+**Example**:
+```javascript
+// After testing
+if (testsFailed) {
+  create_task({
+    title: "Fix failing dark mode tests",
+    description: "Tests fail on mobile viewport",
+    tags: ["FIX", "IMPLEMENT"],
+    priority: 5
+  })
+}
+```
+
+## Task Tag Reference
+
+### Action Tags
+- `IMPLEMENT` - Write new code
+- `FIX` - Fix bugs
+- `REFACTOR` - Improve existing code
+- `TEST` - Write/run tests
+- `ANALYZE` - Analyze for issues
+- `REVIEW` - Code review needed
+
+### Category Tags
+- `FEATURE` - New functionality
+- `BUG` - Something broken
+- `PERFORMANCE` - Speed/efficiency
+- `SECURITY` - Security issues
+- `UI` - User interface
+- `API` - Backend/API work
+
+### Priority Levels
+- 5: Critical (security, breaking bugs)
+- 4: High (important features, performance)
+- 3: Normal (standard tasks)
+- 2: Low (nice to have)
+- 1: Trivial (cleanup, minor issues)
+
+## Best Practices
+
+1. **One Task at a Time**: Focus on single tasks to completion
+2. **Use RAG**: Always query for similar patterns before implementing
+3. **Tag Properly**: This is how tasks route between roles
+4. **Create Follow-ups**: When done, create tasks for the next role
+5. **Document Decisions**: Store important patterns in RAG
+
+## Common Workflows
+
+### Feature Development
+1. Human → Auditor: "Add user authentication"
+2. Auditor creates: "Implement auth system" [FEATURE, IMPLEMENT]
+3. Implementer claims, builds feature
+4. Implementer creates: "Test auth system" [TEST]
+5. Validator tests, creates fixes if needed
+
+### Bug Fix Flow
+1. Validator finds: "Tests failing on Safari"
+2. Creates: "Fix Safari compatibility" [BUG, FIX]
+3. Implementer fixes issue
+4. Creates: "Verify Safari fix" [TEST]
+5. Validator confirms fix
+
+## Troubleshooting
+
+### Can't find tasks?
+```javascript
+// Check all pending tasks
+get_tasks({ status: ["pending"], includeCompleted: false })
+```
+
+### Task blocked?
+```javascript
+update_task(taskId, { 
+  status: "blocked", 
+  blockedBy: "Waiting for API credentials" 
+})
+```
+
+### Need context?
+```javascript
+// Get all context
+const ctx = await get_context()
+
+// Get specific context
+const tasks = await get_context(["tasks"])
+```
+
+Remember: You're Claude with a specific role. Use your intelligence to solve problems, don't just follow scripts!
